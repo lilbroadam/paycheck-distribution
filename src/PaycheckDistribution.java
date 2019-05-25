@@ -1,57 +1,89 @@
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 
 public class PaycheckDistribution {
 	
-	 /* C:   20%  GS:  20%
-	  * LP:  20%  SS:  10%
-	  * LTS: 20%  CRT: 10%
-	  */
+	private static List<Vault> vaults;
 	
 	public static void main(String args[]) {
-		// initialize a vault
-		Vault vault = new Vault("Vault 1");
-		vault.createAccount("Checking", "C", null, 20.0);
-		vault.createAccount("General savings", "GS", null, 20.0);
-		vault.createAccount("Car", "CAR", null, 20.0); // TODO, default name is abbreviation
-		vault.createAccount("Special savings", "SS", null, 10.0);
+		// initialize back end
+		if(vaults == null) // don't overwrite testing data
+			vaults = new ArrayList<>();
+		// read in vaults from memory
 		
-		// add an account object to the vault
-		Account acc1 = new Account("Longterm savings", "LTS", 50.0, null);
-		vault.addAccount(acc1);
+		// initialize front end
+		JFrame gui = new JFrame("Paycheck Distribution");
+		gui.setLocationRelativeTo(null); // open window in center of screen
+		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		vault.printVault();
+		/* Set the menu bar
+		 * https://www.leepoint.net/GUI/components/menus/menus.html
+		 * https://www.javatpoint.com/java-jmenuitem-and-jmenu
+		 * 
+		 * File  Settings  Help
+		 */
+		JMenuBar menuBar = new JMenuBar();
+			JMenu fileMenu = new JMenu("File");
+				fileMenu.add(new JMenu("New..."));
+				fileMenu.add(new JMenu("Open..."));
+				menuBar.add(fileMenu);
+			JMenu settingsMenu = new JMenu("Settings");
+				settingsMenu.add(new JMenuItem("Window size"));
+				menuBar.add(settingsMenu);
+			JMenu helpMenu = new JMenu("Help");
+				helpMenu.add(new JMenuItem("Vault..."));
+				helpMenu.add(new JMenuItem("Paycheck..."));
+				menuBar.add(helpMenu);
+		gui.setJMenuBar(menuBar);
 		
-		// add an anonymous object to the vault
-		vault.addAccount(new Account("Certificate", "CRT", null, 10.0));
+		JPanel viewDetails = new JPanel();
+		viewDetails.setBorder(BorderFactory.createTitledBorder("Select a vault or paycheck to view"));
 		
-		vault.printVault();
+		// Set the view selector
+		JPanel viewSelector = new JPanel();
+		String viewing = "vaults";
+		viewSelector.setLayout(new BoxLayout(viewSelector, BoxLayout.Y_AXIS));
+		viewSelector.setBorder(BorderFactory.createTitledBorder("Your " + viewing));
+		for(Vault vault : vaults) {
+			JButton vaultButton = new JButton(vault.getName());
+			vaultButton.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					viewDetails.removeAll();
+					viewDetails.setBorder(BorderFactory.createTitledBorder(vault.getName()));
+					viewDetails.revalidate();
+				}
+			});
+			viewSelector.add(vaultButton);
+		}
 		
-		acc1.setPercRate(20.0);
+		// set everything into the frame
+		Container c = gui.getContentPane();
+		c.setLayout(new BorderLayout());
+		c.add(viewSelector, BorderLayout.WEST);
+		c.add(viewDetails);
 		
-		vault.printVault();
-		
-		DistributionManager.printDistribution(new Paycheck(100), vault);
-		
-		
-		
-		Vault uln = new Vault("ULN scholarship");
-		uln.createAccount("Chegg subscription", "CHG", 15.94, null);
-		uln.createAccount("Spotify", "Sfy", 5.40, null);
-		uln.createAccount("Loans", "LN", 40.0, null);
-		uln.createAccount("Car", "car", 10.0, null);
-		
-//		DistributionManager.printDistribution(new Paycheck(500), uln);
-		
-		
-		
-		
-		// initialize a vault with account objects
-//		Account acc2 = new Account("Account2", "Ac2", null, 50.00);
-//		Account acc3 = new Account("Account3", "Ac3", null, 50.0);
-//		Account acc4 = new Account("Account4", "Ac4", 20.0, null);
-//		Vault vault2 = new Vault("Vault 2", acc2, acc3, acc4);
-//		vault2.printVault();
-		
+//		gui.pack();
+		gui.setSize(600, 400);
+		gui.setVisible(true);
 	}
+	
+	public static void testingRun(List<Vault> vaults) {
+		PaycheckDistribution.vaults = vaults;
+		main(new String[] {});
+	}
+	
 }
