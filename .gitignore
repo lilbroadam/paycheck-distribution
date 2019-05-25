@@ -1,0 +1,9 @@
+# Compiled class file
+*.class
+
+# Ignore the bin file that Eclipse creates
+/bin/
+
+# Ignore other Eclipse files
+*.classpath
+*.project
