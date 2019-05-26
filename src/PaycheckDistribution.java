@@ -23,12 +23,10 @@ public class PaycheckDistribution {
 		// initialize back end
 		if(vaults == null) // don't overwrite testing data
 			vaults = new ArrayList<>();
-		// read in vaults from memory
+		// read in vaults from memory TODO
 		
 		// initialize front end
 		JFrame gui = new JFrame("Paycheck Distribution");
-		gui.setLocationRelativeTo(null); // open window in center of screen
-		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		/* Set the menu bar
 		 * https://www.leepoint.net/GUI/components/menus/menus.html
@@ -50,37 +48,67 @@ public class PaycheckDistribution {
 				menuBar.add(helpMenu);
 		gui.setJMenuBar(menuBar);
 		
-		JPanel viewDetails = new JPanel();
-		viewDetails.setBorder(BorderFactory.createTitledBorder("Select a vault or paycheck to view"));
-		
-		// Set the view selector
-		JPanel viewSelector = new JPanel();
-		String viewing = "vaults";
+		// Set the viewSelector and detailViewer
+		JPanel viewSelector = new JPanel(); // TODO create a wrapper class for viewSelector like DetailViewer
+		DetailViewer detailViewer = new DetailViewer(null);
 		viewSelector.setLayout(new BoxLayout(viewSelector, BoxLayout.Y_AXIS));
-		viewSelector.setBorder(BorderFactory.createTitledBorder("Your " + viewing));
-		for(Vault vault : vaults) {
-			JButton vaultButton = new JButton(vault.getName());
-			vaultButton.addMouseListener(new MouseAdapter() {
-				public void mouseClicked(MouseEvent e) {
-					viewDetails.removeAll();
-					viewDetails.setBorder(BorderFactory.createTitledBorder(vault.getName()));
-					viewDetails.revalidate();
-				}
-			});
-			viewSelector.add(vaultButton);
+		viewSelector.setBorder(BorderFactory.createTitledBorder("Your vaults"));
+		if(vaults.isEmpty())
+			viewSelector.add(new JLabel("No vaults found"));
+		else {
+			for(Vault vault : vaults) { // add a button for every vault
+				JButton vaultButton = new JButton(vault.getName());
+				vaultButton.addMouseListener(new MouseAdapter() {
+					public void mouseClicked(MouseEvent e) {
+						detailViewer.setItem(vault);
+					}
+				});
+				viewSelector.add(vaultButton);
+			}
 		}
 		
 		// set everything into the frame
 		Container c = gui.getContentPane();
 		c.setLayout(new BorderLayout());
 		c.add(viewSelector, BorderLayout.WEST);
-		c.add(viewDetails);
+		c.add(detailViewer);
 		
-//		gui.pack();
 		gui.setSize(600, 400);
+		gui.setLocationRelativeTo(null); // open window in center of screen
+		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		gui.setVisible(true);
 	}
 	
+	// A wrapper class for the JPanel that shows the details of the selected Vault or Paycheck
+	private static class DetailViewer extends JPanel {
+		public DetailViewer(Object viewItem) {
+			setItem(viewItem);
+		}
+		
+		public void setItem(Object viewItem) {
+			this.removeAll();
+			
+			if(viewItem == null) {
+				setBorder("Select a vault or paycheck to view");
+			} else if (viewItem instanceof Vault) {
+				setBorder(((Vault) viewItem).getName());
+				
+				// sliders: https://docs.oracle.com/javase/tutorial/uiswing/components/slider.html
+			} else if (viewItem instanceof Paycheck) {
+				// TODO
+			} else {
+				throw new IllegalArgumentException("DetailViewer can only view Vault and Paycheck, received ");
+			}
+			
+			this.revalidate();
+		}
+		
+		private void setBorder(String borderTitle) {
+			this.setBorder(BorderFactory.createTitledBorder(borderTitle));
+		}
+	}
+	
+	// A method to run the program with testing data
 	public static void testingRun(List<Vault> vaults) {
 		PaycheckDistribution.vaults = vaults;
 		main(new String[] {});
