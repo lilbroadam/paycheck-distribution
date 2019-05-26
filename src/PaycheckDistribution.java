@@ -94,6 +94,7 @@ public class PaycheckDistribution {
 				setBorder(((Vault) viewItem).getName());
 				
 				// sliders: https://docs.oracle.com/javase/tutorial/uiswing/components/slider.html
+	 			// 			https://www.google.com/search?q=JXMultiThumbSlider&rlz=1C1CHBF_enUS810US810&oq=JXMultiThumbSlider&aqs=chrome..69i57&sourceid=chrome&ie=UTF-8
 			} else if (viewItem instanceof Paycheck) {
 				// TODO
 			} else {
