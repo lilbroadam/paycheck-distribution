@@ -14,6 +14,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class PaycheckDistribution {
 	
@@ -70,7 +71,7 @@ public class PaycheckDistribution {
 		// set everything into the frame
 		Container c = gui.getContentPane();
 		c.setLayout(new BorderLayout());
-		c.add(viewSelector, BorderLayout.WEST);
+		c.add(new JScrollPane(viewSelector), BorderLayout.WEST); // TODO change the scrolling speed and clean this code up
 		c.add(detailViewer);
 		
 		gui.setSize(600, 400);

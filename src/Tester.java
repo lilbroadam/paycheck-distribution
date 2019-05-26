@@ -28,6 +28,8 @@ public class Tester {
 		
 		vaults.add(vault1);
 		vaults.add(vault2);
+		for(int i = 3; i <= 20; i++)
+			vaults.add(new Vault("Vault " + i));
 		PaycheckDistribution.testingRun(vaults);
 	}
 }
