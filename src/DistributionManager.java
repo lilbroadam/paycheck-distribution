@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 /*
  * 
@@ -28,7 +29,7 @@ public class DistributionManager {
 		double totalDistributed = 0.00;
 		
 		
-		ArrayList<Account> accounts = vault.getAccounts();
+		List<Account> accounts = vault.getAccounts();
 		double[] accountDistribution = new double[accounts.size()];
 		
 		// flat rates are applied first

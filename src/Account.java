@@ -17,7 +17,7 @@ public class Account {
 	
 	private String name;
 	private String abbrv;
-		public static final int MAX_ABBRV_LENGTH = 4;
+	public static final int MAX_ABBRV_LENGTH = 4;
 	private Quota quota;
 	private int idNum;
 	
@@ -42,7 +42,7 @@ public class Account {
 	
 	public void setPercRate(double perc) { quota.setPercRate(perc); }
 	
-	public String getName() { return name; }
+	public String getName() { return name; } // TODO change this to name() or make instance var public
 	
 	public String getAbbreviation() { return abbrv; }
 	
