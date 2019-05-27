@@ -1,5 +1,8 @@
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -20,6 +23,8 @@ import javax.swing.SwingUtilities;
 public class PaycheckDistribution {
 	
 	private static List<Vault> vaults;
+	private static int windowWidth = 600;
+	private static int windowHeight = 400;
 	
 	public static void main(String args[]) {
 		// initialize back end
@@ -31,17 +36,33 @@ public class PaycheckDistribution {
 		// initialize front end
 		JFrame gui = new JFrame("Paycheck Distribution");
 		
+		// Set the viewSelector and detailViewer
+		DetailViewer detailViewer = new DetailViewer(null);
+		ViewSelector viewSelector = new ViewSelector(detailViewer);
+		viewSelector.setPreferredSize(new Dimension(windowWidth / 5, windowHeight)); // TODO needs to adjust when window is resized
+		
 		/* Set the menu bar
 		 * https://www.leepoint.net/GUI/components/menus/menus.html
 		 * https://www.javatpoint.com/java-jmenuitem-and-jmenu
 		 * 
-		 * File  Settings  Help
+		 * File  View  Settings  Help
 		 */
 		JMenuBar menuBar = new JMenuBar();
 			JMenu fileMenu = new JMenu("File");
 				fileMenu.add(new JMenu("New..."));
 				fileMenu.add(new JMenu("Open..."));
 				menuBar.add(fileMenu);
+			JMenu viewMenu = new JMenu("View");
+				for(ViewSelector.Viewable viewable : ViewSelector.Viewable.values()) { // add a view button for every viewable
+					JMenuItem menuItem = new JMenuItem(viewable.toString());
+					menuItem.addActionListener(new ActionListener() { // MouseListener won't work with JMenuItem, not totally sure why
+						public void actionPerformed(ActionEvent e) {
+							viewSelector.setItem(viewable);
+						}
+					});
+					viewMenu.add(menuItem);
+				}
+				menuBar.add(viewMenu);
 			JMenu settingsMenu = new JMenu("Settings");
 				settingsMenu.add(new JMenuItem("Window size"));
 				menuBar.add(settingsMenu);
@@ -51,18 +72,13 @@ public class PaycheckDistribution {
 				menuBar.add(helpMenu);
 		gui.setJMenuBar(menuBar);
 		
-		// Set the viewSelector and detailViewer
-		DetailViewer detailViewer = new DetailViewer(null);
-		ViewSelector viewSelector = new ViewSelector(null);
-		viewSelector.setViewer(detailViewer);
-		
 		// set everything into the frame
 		Container c = gui.getContentPane();
 		c.setLayout(new BorderLayout());
 		c.add(new JScrollPane(viewSelector), BorderLayout.WEST); // TODO change the scrolling speed and clean this code up
 		c.add(detailViewer);
 		
-		gui.setSize(600, 400);
+		gui.setSize(windowWidth, windowHeight);
 		gui.setLocationRelativeTo(null); // open window in center of screen
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		gui.setVisible(true);
@@ -83,10 +99,11 @@ public class PaycheckDistribution {
 			} else if (viewItem instanceof Vault) {
 				setBorder(((Vault) viewItem).getName());
 				
-				// TODO
+				// TODO viewing vault details
 				
 			} else if (viewItem instanceof Paycheck) {
-				// TODO
+				// TODO viewing paycheck details
+				
 			} else {
 				throw new IllegalArgumentException("DetailViewer can only view Vault and Paycheck, received " + viewItem.getClass());
 			}
@@ -107,21 +124,18 @@ public class PaycheckDistribution {
 		
 		DetailViewer viewer;
 		
-		public ViewSelector(Viewable viewItem) {
+		public ViewSelector(DetailViewer viewer) {
 			this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-			setItem(viewItem);
-		}
-		
-		public void setViewer(DetailViewer viewer) {
 			this.viewer = viewer;
+			setItem(null);
 		}
 		
 		public void setItem(Viewable viewItem) {
 			this.removeAll();
 			
 			if(viewItem == null) {
-				setBorder("Select to view your vaults or your paychecks"); // FIXME doesn't display right
-				this.add(new JLabel("xxxxxxxxxx"));
+				setBorder("Click view to select viewables"); // FIXME doesn't display well
+				
 			} else if (viewItem == Viewable.Vault) {
 				setBorder("Your vaults");
 				
@@ -143,11 +157,16 @@ public class PaycheckDistribution {
 							}
 						});
 						
+						// TODO set the size of the button to width fill the ViewSelector
+						
 						this.add(vaultButton);
 					}
 				}
 			} else if (viewItem == Viewable.Paycheck) {
-				// TODO
+				setBorder("Your paychecks");
+				
+				// TODO display paychecks
+				
 			} else {
 				throw new IllegalArgumentException("DetailViewer can only view Vault and Paycheck, received " + viewItem.getClass());
 			}
