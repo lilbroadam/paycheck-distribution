@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -12,6 +13,7 @@ import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -106,8 +108,15 @@ public class PaycheckDistribution {
 				this.setLayout(new BorderLayout(0, 10));
 				
 				// select the paycheck to apply
-				this.add(new JLabel("Select paycheck to apply"), BorderLayout.NORTH);
-				// TODO
+				JPanel selectPaycheck = new JPanel();
+				selectPaycheck.setLayout(new BorderLayout(10, 0));
+				
+				selectPaycheck.add(new JLabel("Select paycheck to apply"), BorderLayout.WEST);
+				JComboBox<JButton> paycheckDropDown = new JComboBox<>();
+				paycheckDropDown.add(new JButton("abcdefg")); // TODO add all the paychecks to select from
+				selectPaycheck.add(paycheckDropDown, BorderLayout.CENTER);
+				
+				this.add(selectPaycheck, BorderLayout.NORTH); // FIXME weird spacing
 				
 				// display the vault data
 				Vector<String> columnNames = new Vector<>();
