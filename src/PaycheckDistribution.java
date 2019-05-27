@@ -15,6 +15,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 public class PaycheckDistribution {
 	
@@ -25,6 +26,7 @@ public class PaycheckDistribution {
 		if(vaults == null) // don't overwrite testing data
 			vaults = new ArrayList<>();
 		// read in vaults from memory TODO
+		
 		
 		// initialize front end
 		JFrame gui = new JFrame("Paycheck Distribution");
@@ -50,23 +52,9 @@ public class PaycheckDistribution {
 		gui.setJMenuBar(menuBar);
 		
 		// Set the viewSelector and detailViewer
-		JPanel viewSelector = new JPanel(); // TODO create a wrapper class for viewSelector like DetailViewer
 		DetailViewer detailViewer = new DetailViewer(null);
-		viewSelector.setLayout(new BoxLayout(viewSelector, BoxLayout.Y_AXIS));
-		viewSelector.setBorder(BorderFactory.createTitledBorder("Your vaults"));
-		if(vaults.isEmpty())
-			viewSelector.add(new JLabel("No vaults found"));
-		else {
-			for(Vault vault : vaults) { // add a button for every vault
-				JButton vaultButton = new JButton(vault.getName());
-				vaultButton.addMouseListener(new MouseAdapter() {
-					public void mouseClicked(MouseEvent e) {
-						detailViewer.setItem(vault);
-					}
-				});
-				viewSelector.add(vaultButton);
-			}
-		}
+		ViewSelector viewSelector = new ViewSelector(null);
+		viewSelector.setViewer(detailViewer);
 		
 		// set everything into the frame
 		Container c = gui.getContentPane();
@@ -82,6 +70,7 @@ public class PaycheckDistribution {
 	
 	// A wrapper class for the JPanel that shows the details of the selected Vault or Paycheck
 	private static class DetailViewer extends JPanel {
+		
 		public DetailViewer(Object viewItem) {
 			setItem(viewItem);
 		}
@@ -94,15 +83,76 @@ public class PaycheckDistribution {
 			} else if (viewItem instanceof Vault) {
 				setBorder(((Vault) viewItem).getName());
 				
-				// sliders: https://docs.oracle.com/javase/tutorial/uiswing/components/slider.html
-	 			// 			https://www.google.com/search?q=JXMultiThumbSlider&rlz=1C1CHBF_enUS810US810&oq=JXMultiThumbSlider&aqs=chrome..69i57&sourceid=chrome&ie=UTF-8
+				// TODO
+				
 			} else if (viewItem instanceof Paycheck) {
 				// TODO
 			} else {
-				throw new IllegalArgumentException("DetailViewer can only view Vault and Paycheck, received ");
+				throw new IllegalArgumentException("DetailViewer can only view Vault and Paycheck, received " + viewItem.getClass());
 			}
 			
-			this.revalidate();
+			this.revalidate(); // update the gui
+		}
+		
+		private void setBorder(String borderTitle) {
+			this.setBorder(BorderFactory.createTitledBorder(borderTitle));
+		}
+	}
+	
+	private static class ViewSelector extends JPanel {
+		
+		private static enum Viewable {
+			Vault, Paycheck
+		}
+		
+		DetailViewer viewer;
+		
+		public ViewSelector(Viewable viewItem) {
+			this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+			setItem(viewItem);
+		}
+		
+		public void setViewer(DetailViewer viewer) {
+			this.viewer = viewer;
+		}
+		
+		public void setItem(Viewable viewItem) {
+			this.removeAll();
+			
+			if(viewItem == null) {
+				setBorder("Select to view your vaults or your paychecks"); // FIXME doesn't display right
+				this.add(new JLabel("xxxxxxxxxx"));
+			} else if (viewItem == Viewable.Vault) {
+				setBorder("Your vaults");
+				
+				if(vaults.isEmpty())
+					this.add(new JLabel("No vaults found"));
+				else {
+					for(Vault vault : vaults) { // add a button for every vault
+						JButton vaultButton = new JButton(vault.getName());
+						vaultButton.addMouseListener(new MouseAdapter() {
+							public void mouseClicked(MouseEvent e) {
+								if(SwingUtilities.isLeftMouseButton(e))
+									viewer.setItem(vault);
+								else if(SwingUtilities.isRightMouseButton(e)) {
+									// TODO pop up window that lets you edit the vault
+									
+									// sliders: https://docs.oracle.com/javase/tutorial/uiswing/components/slider.html
+						 			// 			https://www.google.com/search?q=JXMultiThumbSlider&rlz=1C1CHBF_enUS810US810&oq=JXMultiThumbSlider&aqs=chrome..69i57&sourceid=chrome&ie=UTF-8
+								}
+							}
+						});
+						
+						this.add(vaultButton);
+					}
+				}
+			} else if (viewItem == Viewable.Paycheck) {
+				// TODO
+			} else {
+				throw new IllegalArgumentException("DetailViewer can only view Vault and Paycheck, received " + viewItem.getClass());
+			}
+			
+			this.revalidate(); // update the gui	
 		}
 		
 		private void setBorder(String borderTitle) {
