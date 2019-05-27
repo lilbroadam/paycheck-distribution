@@ -7,6 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -18,6 +19,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
 public class PaycheckDistribution {
@@ -97,9 +99,36 @@ public class PaycheckDistribution {
 			if(viewItem == null) {
 				setBorder("Select a vault or paycheck to view");
 			} else if (viewItem instanceof Vault) {
-				setBorder(((Vault) viewItem).getName());
+				Vault vault = (Vault) viewItem;
 				
-				// TODO viewing vault details
+				// prep this JPanel
+				setBorder(vault.getName());
+				this.setLayout(new BorderLayout(0, 10));
+				
+				// select the paycheck to apply
+				this.add(new JLabel("Select paycheck to apply"), BorderLayout.NORTH);
+				// TODO
+				
+				// display the vault data
+				Vector<String> columnNames = new Vector<>();
+				columnNames.add("Name"); columnNames.add("Flat"); columnNames.add("Percentage"); columnNames.add("Distribution");
+				
+				Vector<Vector<String>> vaultData = new Vector<>();
+				for(Account acc : vault) {
+					Vector<String> accountData = new Vector<>();
+					
+					accountData.add(acc.getName());
+					accountData.add("$" + acc.getFlatRate());
+					accountData.add(acc.getPercRate() + "%");
+					accountData.add(""); // TODO
+					
+					vaultData.add(accountData);
+				}
+				
+				JTable vaultDetails = new JTable(vaultData, columnNames);
+				// TODO make table non-editable
+				
+				this.add(new JScrollPane(vaultDetails), BorderLayout.CENTER); // column names won't show up w/o ScrollPane, not sure why
 				
 			} else if (viewItem instanceof Paycheck) {
 				// TODO viewing paycheck details
