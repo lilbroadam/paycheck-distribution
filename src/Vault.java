@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /* Vaults contain and manage accounts.
@@ -18,15 +20,16 @@ import java.util.NoSuchElementException;
  *   - a way to reorder accounts
  */
 
-public class Vault {
+public class Vault implements Iterable<Account> {
 	
 	private String name;
-	private ArrayList<Account> accounts = new ArrayList<Account>();
+	private List<Account> accounts;
 	
 	private double percTotal;
 
 	public Vault(String vaultName) {
 		name = vaultName;
+		accounts = new ArrayList<Account>();
 	}
 	
 	public Vault(String vaultName, Account ... initialAccounts) {
@@ -74,7 +77,7 @@ public class Vault {
 	
 	public String getName() { return name; }
 	
-	public ArrayList<Account> getAccounts() { return accounts; }
+	public List<Account> getAccounts() { return accounts; }
 	
 	// search for and return the given account by name or abbreviation.
 	// return a NoSuchElementException if account isn't found
@@ -115,5 +118,22 @@ public class Vault {
 		if(!checkPercTotal()) {
 			System.out.println("Warning: the total percentage of the volt is " + percTotal + "%, not 100%");
 		}
+	}
+
+	public Iterator<Account> iterator() {
+		return new Iterator<Account>() {
+			Iterator<Account> internalIt = accounts.iterator(); 
+			
+			public boolean hasNext() {
+				return internalIt.hasNext();
+			}
+			
+			public Account next() {
+				return internalIt.next();
+			}
+			
+			// don't want this iterator to be able to remove accounts from the vault
+			
+		};
 	}
 }
