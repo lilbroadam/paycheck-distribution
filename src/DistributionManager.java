@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /*
  *
@@ -20,32 +21,19 @@ public class DistributionManager {
 		Distribution distribution = new Distribution(vault);
 
 		List<Account> accounts = vault.getAccounts();
-		Map<String, Double> distributionAmount = new HashMap<>();
 		double paycheckRemaining = paycheck.getPayAmount();
 
 		// distribute flat rates first
 		for(Account acc : accounts) {
-			// populate the distributionAmount map
-			if(!distributionAmount.containsKey(acc.getName()))
-				distributionAmount.put(acc.getName(), new Double(0.0));
-
-			// distribute the flat rate if the account has a flat rate
-			if(acc.getFlatRate() > 0) {
-				distributionAmount.put(acc.getName(), new Double(acc.getFlatRate()));
-				paycheckRemaining -= acc.getFlatRate();
-			}
+			distribution.addAmount(acc.getName(), acc.getFlatRate());
+			paycheckRemaining -= acc.getFlatRate();
 		}
 
 		// distribute perc rates second (last)
 		double percDistPoolAmount = paycheckRemaining;
 		for(Account acc : accounts) {
-
 			double percDist = percDistPoolAmount * (acc.getPercRate() / 100.0);
-
-			distributionAmount.put(acc.getName(),
-				new Double(distributionAmount.get(acc.getName()) + percDist)
-			);
-
+			distribution.addAmount(acc.getName(), percDist);
 			paycheckRemaining -= percDist;
 		}
 
@@ -53,13 +41,20 @@ public class DistributionManager {
 		System.out.println(paycheckRemaining == 0.0 ? "No remainder left over" : "remainder: " + paycheckRemaining);
 
 		// TODO delete temporary console output
-		for(String acc : distributionAmount.keySet())
-			System.out.println(acc + ": " + distributionAmount.get(acc));
+		distribution.printDistribution();
+		
+		// TODO write to disk
+		recordDistribution(distribution);
 
-		return new Distribution(vault); // TODO maybe should just return a regular Map?
+		return distribution;
 	}
-
+	
+	private static void recordDistribution(Distribution distribution) {
+		// TODO record distribution (write to disk)
+	}
+	
 	// print the distribution amounts for the given paycheck into the given vault
+	// TODO probably should delete this; out dated
 	public static void printDistribution(Paycheck paycheck, Vault vault) {
 		final double PAYCHECK_AMOUNT = paycheck.getPayAmount();
 		double paycheckRemaining = PAYCHECK_AMOUNT;
@@ -108,8 +103,27 @@ public class DistributionManager {
 }
 
 class Distribution {
-
+	
+	Map<String, Double> distribution;
+	
 	public Distribution(Vault vault) {
-
+		distribution = new TreeMap<>();
+	}
+	
+	public void addAmount(String account, double amount) {
+		// populate the distribution map
+		if(!distribution.containsKey(account))
+			distribution.put(account, new Double(amount));
+		else
+			distribution.put(account, new Double(distribution.get(account) + amount));
+	}
+	
+	public void printDistribution() {
+		for(String acc : distribution.keySet())
+			System.out.println(acc + ": $" + distribution.get(acc));
+	}
+	
+	public String toString() {
+		return distribution.toString();
 	}
 }

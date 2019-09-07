@@ -5,9 +5,7 @@ import java.util.Scanner;
 
 public class Tester {
 
-	/* Checking: 20%  Savings: 60%
-	 * New car:  20%  Phone:  $30
-	 */
+	/* Checking: $10, 40%; Savings: $20, 60% */
 
 	private static List<Vault> vaults;
 
@@ -16,7 +14,7 @@ public class Tester {
 		vault.createAccount("Checking", "C", 10.00, 40.00);
 		vault.createAccount("Savings", "GS", 20.00, 60.00);
 
-		System.out.print("Paycheck amount: ");
+		System.out.print("Paycheck amount: $");
 		Paycheck paycheck = new Paycheck(new Scanner(System.in).nextDouble()); // FIXME scanner temp input
 		System.out.println();
 
